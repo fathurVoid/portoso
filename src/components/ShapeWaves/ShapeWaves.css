@@ -22,6 +22,15 @@
   opacity: 1;
 }
 
+/* Fallback ringan saat WebGPU tidak tersedia atau masih initialize. */
+.shape-waves[data-ready='false'] {
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(140, 16, 16, 0.28),
+    rgba(3, 3, 3, 0) 62%
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shape-waves__canvas {
     transition: none;

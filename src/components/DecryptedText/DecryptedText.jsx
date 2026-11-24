@@ -34,18 +34,6 @@ export default function DecryptedText({
   clickMode = 'once',
   ...props
 }) {
-  const [displayText, setDisplayText] = useState(text);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [revealedIndices, setRevealedIndices] = useState(new Set());
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [isDecrypted, setIsDecrypted] = useState(animateOn !== 'click');
-  const [direction, setDirection] = useState('forward');
-
-  const containerRef = useRef(null);
-  const orderRef = useRef([]);
-  const pointerRef = useRef(0);
-  const intervalRef = useRef(null);
-
   const availableChars = useMemo(() => {
     return useOriginalCharsOnly
       ? Array.from(new Set(text.split(''))).filter(char => char !== ' ')
@@ -65,6 +53,41 @@ export default function DecryptedText({
     },
     [availableChars]
   );
+
+  const [displayText, setDisplayText] = useState(() =>
+    animateOn === 'click' ? shuffleText(text, new Set()) : text
+  );
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [revealedIndices, setRevealedIndices] = useState(new Set());
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [isDecrypted, setIsDecrypted] = useState(animateOn !== 'click');
+  const [direction, setDirection] = useState('forward');
+  const [resetConfig, setResetConfig] = useState({
+    animateOn,
+    text,
+    characters,
+    useOriginalCharsOnly
+  });
+
+  const containerRef = useRef(null);
+  const orderRef = useRef([]);
+  const pointerRef = useRef(0);
+  const intervalRef = useRef(null);
+
+  // Derive the reset from props instead of writing state inside an effect.
+  if (
+    resetConfig.animateOn !== animateOn ||
+    resetConfig.text !== text ||
+    resetConfig.characters !== characters ||
+    resetConfig.useOriginalCharsOnly !== useOriginalCharsOnly
+  ) {
+    setResetConfig({ animateOn, text, characters, useOriginalCharsOnly });
+    const emptySet = new Set();
+    setDisplayText(animateOn === 'click' ? shuffleText(text, emptySet) : text);
+    setIsDecrypted(animateOn !== 'click');
+    setRevealedIndices(emptySet);
+    setDirection('forward');
+  }
 
   const computeOrder = useCallback(
     len => {
@@ -110,13 +133,6 @@ export default function DecryptedText({
     }
     return new Set(arr);
   }, []);
-
-  const encryptInstantly = useCallback(() => {
-    const emptySet = new Set();
-    setRevealedIndices(emptySet);
-    setDisplayText(shuffleText(text, emptySet));
-    setIsDecrypted(false);
-  }, [text, shuffleText]);
 
   const triggerDecrypt = useCallback(() => {
     if (sequential) {
@@ -341,17 +357,6 @@ export default function DecryptedText({
       }
     };
   }, [animateOn, hasAnimated, triggerDecrypt]);
-
-  useEffect(() => {
-    if (animateOn === 'click') {
-      encryptInstantly();
-    } else {
-      setDisplayText(text);
-      setIsDecrypted(true);
-    }
-    setRevealedIndices(new Set());
-    setDirection('forward');
-  }, [animateOn, text, encryptInstantly]);
 
   const animateProps =
     animateOn === 'hover' || animateOn === 'inViewHover'

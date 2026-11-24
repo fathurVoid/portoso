@@ -634,13 +634,12 @@ const ElectricLogo = ({
     image.decoding = 'async';
     image.onload = () => {
       if (!alive) return;
-      let traced = null;
       try {
-        traced = traceShape(image);
+        const traced = traceShape(image);
+        if (traced) shapeRef.current = traced;
       } catch {
-        traced = null;
+        // Biarkan bentuk sebelumnya jika tracing gagal.
       }
-      if (traced) shapeRef.current = traced;
     };
     image.src = src || BOLT;
     return () => {

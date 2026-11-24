@@ -129,7 +129,7 @@ if (isLoading) {
 
   return (
     <>
-      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <ElectricLogo
           src="/favicon.png"
           color="#000000"
@@ -156,9 +156,9 @@ if (isLoading) {
           <h1>fathurVoid</h1>
           <nav>
             <ul>
-              <li><a href="#profil"></a></li>
-              <li><a href="#jadwal"></a></li>
-              <li><a href="#contact"></a></li>
+              <li><a href="#profil">Profile</a></li>
+              <li><a href="#jadwal">Academic</a></li>
+              <li><a href="#contact">Contact</a></li>
             </ul>
           </nav>
         </header>
